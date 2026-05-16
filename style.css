@@ -211,15 +211,17 @@ body::before {
   cursor: pointer;
   transition: all var(--trans);
   display: grid; place-items: center;
-  opacity: 0.65;
+  opacity: 1;
   line-height: 1;
-  color: var(--text-primary);
+  color: var(--text-secondary);
+  -webkit-text-fill-color: var(--text-secondary);
 }
 
-.lang-btn:hover { opacity: 1; background: var(--bg-card-hover); border-color: var(--border-strong); }
+.lang-btn:hover { color: var(--text-primary); -webkit-text-fill-color: var(--text-primary); background: var(--bg-card-hover); border-color: var(--border-strong); }
 
 .lang-btn.active {
-  opacity: 1;
+  color: var(--text-primary);
+  -webkit-text-fill-color: var(--text-primary);
   border-color: var(--accent);
   background: var(--accent-dim);
   box-shadow: 0 0 8px var(--accent-glow);
@@ -739,8 +741,12 @@ body::before {
 .about-tagline { color:var(--text-secondary); font-size:15px; }
 
 .about-grid {
-  display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+  display:flex; flex-wrap:wrap; justify-content:center;
   gap:14px; margin-bottom:14px;
+}
+
+.about-grid .about-card {
+  flex: 1 1 280px; max-width: 420px; margin-bottom:0;
 }
 
 .about-card {
@@ -811,25 +817,15 @@ body::before {
 }
 
 /* School card */
-.school-card { display:flex; flex-direction:column; gap:14px; align-items:center; text-align:center; }
-.school-logo-row { display:flex; flex-direction:column; align-items:center; gap:12px; width:100%; }
+.school-card { display:flex; flex-direction:column; gap:8px; align-items:center; text-align:center; padding: 28px 22px; }
+.school-logo-row { display:flex; flex-direction:column; align-items:center; gap:10px; width:100%; }
 
-.school-logo-placeholder {
-  width:64px; height:64px; border-radius:12px;
-  background:linear-gradient(135deg,#006600,#003300);
-  display:flex; flex-direction:column; align-items:center; justify-content:center;
-  gap:2px;
-}
+.school-logo-placeholder { display:none; }
+.school-logo-text { display:none; }
 
-.school-logo-placeholder span:first-child {
-  font-family:'Syne',sans-serif; font-size:18px; font-weight:800; color:#fff;
-}
-
-.school-logo-text { font-size:7px; color:rgba(255,255,255,0.7); text-align:center; line-height:1.2; }
-
-.school-info { display:flex; flex-direction:column; gap:6px; align-items:center; text-align:center; }
-.school-info strong { font-size:15px; font-weight:700; }
-.school-info small { font-size:12px; color:var(--text-muted); }
+.school-info { display:flex; flex-direction:column; gap:8px; align-items:center; text-align:center; }
+.school-info strong { font-family:'Syne',sans-serif; font-size:16px; font-weight:700; color: var(--text-primary); }
+.school-info small { font-size:13px; color:var(--text-muted); }
 
 .about-copyright {
   text-align:center; padding:24px 0 8px;
