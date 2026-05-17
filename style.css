@@ -206,22 +206,19 @@ body::before {
   width: 32px; height: 28px;
   border: 1px solid transparent;
   border-radius: 6px;
-  background: var(--bg-card);
+  background: none;
   font-size: 16px;
   cursor: pointer;
   transition: all var(--trans);
   display: grid; place-items: center;
-  opacity: 1;
+  opacity: 0.5;
   line-height: 1;
-  color: var(--text-secondary);
-  -webkit-text-fill-color: var(--text-secondary);
 }
 
-.lang-btn:hover { color: var(--text-primary); -webkit-text-fill-color: var(--text-primary); background: var(--bg-card-hover); border-color: var(--border-strong); }
+.lang-btn:hover { opacity: 0.85; background: var(--bg-card); }
 
 .lang-btn.active {
-  color: var(--text-primary);
-  -webkit-text-fill-color: var(--text-primary);
+  opacity: 1;
   border-color: var(--accent);
   background: var(--accent-dim);
   box-shadow: 0 0 8px var(--accent-glow);
@@ -741,12 +738,8 @@ body::before {
 .about-tagline { color:var(--text-secondary); font-size:15px; }
 
 .about-grid {
-  display:flex; flex-wrap:wrap; justify-content:center;
+  display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
   gap:14px; margin-bottom:14px;
-}
-
-.about-grid .about-card {
-  flex: 1 1 280px; max-width: 420px; margin-bottom:0;
 }
 
 .about-card {
@@ -817,15 +810,25 @@ body::before {
 }
 
 /* School card */
-.school-card { display:flex; flex-direction:column; gap:8px; align-items:center; text-align:center; padding: 28px 22px; }
-.school-logo-row { display:flex; flex-direction:column; align-items:center; gap:10px; width:100%; }
+.school-card { display:flex; flex-direction:column; gap:14px; }
+.school-logo-row { display:flex; align-items:center; gap:16px; }
 
-.school-logo-placeholder { display:none; }
-.school-logo-text { display:none; }
+.school-logo-placeholder {
+  width:64px; height:64px; border-radius:12px;
+  background:linear-gradient(135deg,#006600,#003300);
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  flex-shrink:0; gap:2px;
+}
 
-.school-info { display:flex; flex-direction:column; gap:8px; align-items:center; text-align:center; }
-.school-info strong { font-family:'Syne',sans-serif; font-size:16px; font-weight:700; color: var(--text-primary); }
-.school-info small { font-size:13px; color:var(--text-muted); }
+.school-logo-placeholder span:first-child {
+  font-family:'Syne',sans-serif; font-size:18px; font-weight:800; color:#fff;
+}
+
+.school-logo-text { font-size:7px; color:rgba(255,255,255,0.7); text-align:center; line-height:1.2; }
+
+.school-info { display:flex; flex-direction:column; gap:4px; }
+.school-info strong { font-size:14px; font-weight:600; }
+.school-info small { font-size:12px; color:var(--text-muted); }
 
 .about-copyright {
   text-align:center; padding:24px 0 8px;
@@ -896,3 +899,53 @@ body::before {
   .flags-grid  { grid-template-columns:repeat(2,1fr); }
   .color-row   { flex-direction:column; align-items:flex-start; }
 }
+
+/* ─── VOICE BUTTON ─── */
+#voiceBtn {
+  color: var(--text-secondary);
+  position: relative;
+}
+
+#voiceBtn.voice-active {
+  color: var(--off);
+  border-color: rgba(239,68,68,0.5);
+  background: rgba(239,68,68,0.1);
+  animation: voicePulse 1.2s ease-in-out infinite;
+}
+
+@keyframes voicePulse {
+  0%,100% { box-shadow: 0 0 0 0 rgba(239,68,68,0.4); }
+  50%      { box-shadow: 0 0 0 8px rgba(239,68,68,0); }
+}
+
+/* Indicador de suporte a voz — mostra ícone cinzento se não suportado */
+#voiceBtn.voice-unsupported {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+/* ─── OFFLINE BANNER ─── */
+#offlineBanner {
+  font-family: 'DM Sans', sans-serif;
+}
+
+/* ─── AUTH OVERLAY input focus ─── */
+#authInput:focus {
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+/* ─── SETTINGS — voice section ─── */
+.voice-status-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 14px; border-radius: var(--radius-sm);
+  background: var(--bg-input); border: 1px solid var(--border);
+  font-size: 13px; color: var(--text-secondary);
+}
+
+.voice-status-row .dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--off); flex-shrink: 0;
+}
+
+.voice-status-row.ok .dot { background: var(--on); }
