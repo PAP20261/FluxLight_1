@@ -6,7 +6,7 @@
    ─────────────────────────────────────────────────────────────── */
 
 // 🔒 PASSWORD DA APP — alterar aqui
-const APP_PASSWORD = "fluxlight2025";
+const APP_PASSWORD = "fluxlight";
 
 // ❗ IP do ESP32 (ver no Serial Monitor após gravar)
 const ESP32_IP = "http://192.168.1.115";
@@ -1047,7 +1047,7 @@ function showLoginOverlay() {
           letter-spacing:-1px;background:linear-gradient(135deg,#f97316,#facc15);
           -webkit-background-clip:text;-webkit-text-fill-color:transparent;
           background-clip:text;margin:0 0 4px">FluxLight</h2>
-        <p style="font-size:13px;color:var(--text-muted);margin:0" id="authSubtitle">Introduz a password para continuar</p>
+        <p style="font-size:13px;color:var(--text-muted);margin:0;font-family:'DM Sans',sans-serif" id="authSubtitle">Introduz a password para continuar</p>
       </div>
       <div style="width:100%;position:relative">
         <input type="password" id="authInput" placeholder="Password"
@@ -1071,7 +1071,7 @@ function showLoginOverlay() {
         Entrar
       </button>
       <p style="font-size:12px;color:var(--text-muted);margin:0">
-        FluxLight PAP 2024/2025
+        FluxLight PAP 2025/2026
       </p>
     </div>`;
 
@@ -1098,7 +1098,26 @@ function submitAuth() {
     if (overlay) {
       overlay.style.opacity = "0";
       overlay.style.transition = "opacity 0.4s ease";
-      setTimeout(() => overlay.remove(), 400);
+      setTimeout(() => {
+        overlay.remove();
+        // Animação de entrada na main após login
+        const main = document.getElementById("main");
+        const sidebar = document.getElementById("sidebar");
+        if (main) {
+          main.style.opacity = "0";
+          main.style.transform = "translateY(18px)";
+          main.style.transition = "opacity 0.5s ease, transform 0.5s ease";
+          requestAnimationFrame(() => {
+            main.style.opacity = "1";
+            main.style.transform = "translateY(0)";
+          });
+        }
+        if (sidebar) {
+          sidebar.style.opacity = "0";
+          sidebar.style.transition = "opacity 0.5s 0.1s ease";
+          requestAnimationFrame(() => { sidebar.style.opacity = "1"; });
+        }
+      }, 400);
     }
     document.body.style.overflow = "";
   } else {
