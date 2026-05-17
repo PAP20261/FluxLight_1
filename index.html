@@ -378,6 +378,86 @@
         <code class="code-tag">#define LED_PIN 13</code>
       </div>
     </div>
+
+    <div class="settings-card">
+      <h3>🎙️ Controlo por Voz</h3>
+      <p class="settings-note">Usa a <strong>Web Speech API</strong> do browser — sem chave nem servidor externo.</p>
+      <div class="settings-field">
+        <label>Estado</label>
+        <div class="voice-status-row" id="voiceStatusRow">
+          <span class="dot"></span>
+          <span id="voiceStatusText">A verificar suporte...</span>
+        </div>
+      </div>
+      <div class="settings-field">
+        <label>Browsers compatíveis</label>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px">
+          <span class="code-tag" style="flex:none">✅ Chrome</span>
+          <span class="code-tag" style="flex:none">✅ Edge</span>
+          <span class="code-tag" style="flex:none">✅ Safari iOS 14.5+</span>
+          <span class="code-tag" style="flex:none">❌ Firefox</span>
+        </div>
+      </div>
+      <div class="settings-field">
+        <label>Exemplos de comandos</label>
+        <div style="display:flex;flex-direction:column;gap:6px;margin-top:4px">
+          <code class="code-tag">"Ligar fita" / "Desligar led"</code>
+          <code class="code-tag">"Efeito arco-íris" / "Parar efeito"</code>
+          <code class="code-tag">"Cor vermelha" / "Cor branca"</code>
+          <code class="code-tag">"Brilho máximo" / "Brilho mínimo"</code>
+          <code class="code-tag">"Bandeira Portugal" / "Cena festa"</code>
+          <code class="code-tag">"Ligar lâmpadas" / "Desligar tudo"</code>
+        </div>
+      </div>
+      <div class="settings-field">
+        <label>Nota</label>
+        <p class="settings-note" style="margin:0">
+          Requer <strong>HTTPS</strong> ou <code>localhost</code>. Em <code>file://</code> o microfone é bloqueado pelo browser.
+          Usa <strong>GitHub Pages</strong> para garantir HTTPS.
+        </p>
+      </div>
+    </div>
+
+    <div class="settings-card">
+      <h3>🔒 Autenticação</h3>
+      <p class="settings-note">Password definida em <code>script.js</code> → <code>APP_PASSWORD</code>. A sessão expira ao fechar o browser.</p>
+      <div class="settings-field">
+        <label>Password atual</label>
+        <div class="settings-row">
+          <code class="code-tag" id="displayPassword">••••••••••••••</code>
+          <button class="btn-edit" onclick="toggleShowPassword(this)">Mostrar</button>
+        </div>
+      </div>
+      <div class="settings-field">
+        <label>Sessão</label>
+        <div class="voice-status-row ok">
+          <span class="dot"></span>
+          <span>Autenticado — sessão ativa até fechar o browser</span>
+        </div>
+      </div>
+      <div class="settings-field" style="margin-top:4px">
+        <button class="btn-stop-effect" onclick="lockApp()" style="width:100%;justify-content:center">
+          <i data-lucide="lock"></i> Bloquear App / Terminar Sessão
+        </button>
+      </div>
+    </div>
+
+    <div class="settings-card">
+      <h3>💾 Modo Offline</h3>
+      <p class="settings-note">O último estado é guardado em <code>localStorage</code> e restaurado automaticamente se o ESP32 não responder.</p>
+      <div class="settings-field">
+        <label>Dados guardados</label>
+        <div class="voice-status-row ok" id="offlineStateRow">
+          <span class="dot"></span>
+          <span id="offlineStateText">A verificar...</span>
+        </div>
+      </div>
+      <div class="settings-field" style="margin-top:4px">
+        <button class="btn-stop-effect" onclick="clearOfflineState()" style="width:100%;justify-content:center">
+          <i data-lucide="trash-2"></i> Limpar estado guardado
+        </button>
+      </div>
+    </div>
   </section>
 
   <!-- SOBRE -->
@@ -489,9 +569,13 @@
 
     <div class="about-card school-card">
       <div class="school-logo-row">
+        <div class="school-logo-placeholder">
+          <span>AE</span>
+          <span class="school-logo-text">Montemor-o-Velho</span>
+        </div>
         <div class="school-info">
           <strong>Agrupamento de Escolas de Montemor-o-Velho</strong>
-          <small data-i18n="school_sub">Cofinanciado pela União Europeia · Portugal 2030</small>
+          <small>COD 161433 · <span data-i18n="school_sub">Cofinanciado pela União Europeia · Portugal 2030</span></small>
         </div>
       </div>
     </div>
