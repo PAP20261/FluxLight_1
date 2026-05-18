@@ -211,14 +211,21 @@ body::before {
   cursor: pointer;
   transition: all var(--trans);
   display: grid; place-items: center;
-  opacity: 0.5;
+  opacity: 1;
   line-height: 1;
+  color: var(--text-primary);
+  filter: grayscale(30%) brightness(0.8);
 }
 
-.lang-btn:hover { opacity: 0.85; background: var(--bg-card); }
+.lang-btn:hover {
+  filter: grayscale(0%) brightness(1);
+  background: var(--bg-card);
+  border-color: var(--border);
+}
 
 .lang-btn.active {
   opacity: 1;
+  filter: grayscale(0%) brightness(1);
   border-color: var(--accent);
   background: var(--accent-dim);
   box-shadow: 0 0 8px var(--accent-glow);
@@ -740,7 +747,7 @@ body::before {
 .about-grid {
   display:grid; grid-template-columns:repeat(2,1fr);
   gap:14px; margin-bottom:14px;
-  max-width:740px;
+  max-width:740px; margin-left:auto; margin-right:auto;
 }
 
 .about-card {
