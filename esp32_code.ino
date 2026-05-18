@@ -10,8 +10,8 @@
 
 // ═══ CONFIGURAÇÃO — ALTERAR AQUI ═══════════════════════════════
 
-const char* ssid     = "O_TEU_WIFI";       // ← Wi-Fi SSID
-const char* password = "A_TUA_PASSWORD";   // ← Wi-Fi Password
+const char* ssid     = "NOS_Internet_32C0";       // ← Wi-Fi SSID
+const char* password = "2LL8NJ77E5E";   // ← Wi-Fi Password
 
 #define LED_PIN   13    // ← GPIO do DATA da fita
 #define NUM_LEDS  300   // ← Número de LEDs
