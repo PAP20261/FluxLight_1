@@ -6,7 +6,7 @@
    ─────────────────────────────────────────────────────────────── */
 
 // 🔒 PASSWORD DA APP — alterar aqui
-const APP_PASSWORD = "fluxlight";
+const APP_PASSWORD = "fluxlight2025";
 
 // ❗ IP do ESP32 (ver no Serial Monitor após gravar)
 const ESP32_IP = "http://192.168.1.115";
@@ -1010,7 +1010,6 @@ function checkAuth() {
 }
 
 function showLoginOverlay() {
-  // Bloquear scroll
   document.body.style.overflow = "hidden";
 
   const overlay = document.createElement("div");
@@ -1019,17 +1018,24 @@ function showLoginOverlay() {
     position:fixed; inset:0; z-index:10000;
     background:var(--bg-base);
     display:flex; align-items:center; justify-content:center;
-    animation:fadeIn 0.3s ease;
   `;
 
+  // Fundo radial igual ao splash
   overlay.innerHTML = `
-    <div style="
+    <div style="position:absolute;inset:0;
+      background:radial-gradient(ellipse at 50% 40%, rgba(249,115,22,0.10) 0%, transparent 70%);
+      pointer-events:none;"></div>
+
+    <div id="authCard" style="
+      position:relative; z-index:1;
       background:var(--bg-card); border:1px solid var(--border-strong);
       border-radius:20px; padding:40px 36px; width:340px;
       display:flex; flex-direction:column; align-items:center; gap:20px;
-      text-align:center; position:relative;
+      text-align:center;
+      opacity:0; transform:translateY(24px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
     ">
-      <svg width="56" height="56" viewBox="0 0 64 64" fill="none">
+      <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
         <circle cx="32" cy="32" r="30" stroke="url(#authG1)" stroke-width="2"/>
         <path d="M32 10 C18 10 12 20 12 28 C12 38 18 45 24 47 L24 52 L40 52 L40 47 C46 45 52 38 52 28 C52 20 46 10 32 10Z" fill="url(#authG2)"/>
         <rect x="24" y="52" width="16" height="4" rx="2" fill="url(#authG2)"/>
@@ -1042,44 +1048,76 @@ function showLoginOverlay() {
           </linearGradient>
         </defs>
       </svg>
+
       <div>
-        <h2 style="font-family:'Syne',sans-serif;font-size:28px;font-weight:800;
-          letter-spacing:-1px;background:linear-gradient(135deg,#f97316,#facc15);
-          -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-          background-clip:text;margin:0 0 4px">FluxLight</h2>
-        <p style="font-size:13px;color:var(--text-muted);margin:0;font-family:'DM Sans',sans-serif" id="authSubtitle">Introduz a password para continuar</p>
+        <h2 style="
+          font-family:'Syne',sans-serif; font-size:32px; font-weight:800;
+          letter-spacing:-1.5px; margin:0 0 6px;
+          background:linear-gradient(135deg,#f97316,#facc15);
+          -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+          background-clip:text;
+        ">FluxLight</h2>
+        <p style="
+          font-family:'DM Sans',sans-serif; font-size:13px;
+          color:var(--text-secondary); margin:0; letter-spacing:0.3px;
+        ">Introduz a password para continuar</p>
       </div>
-      <div style="width:100%;position:relative">
+
+      <div style="width:100%; position:relative;">
         <input type="password" id="authInput" placeholder="Password"
-          style="width:100%;padding:12px 44px 12px 16px;background:var(--bg-input);
-          border:1px solid var(--border-strong);border-radius:10px;color:var(--text-primary);
-          font-family:'DM Sans',sans-serif;font-size:15px;outline:none;box-sizing:border-box;"
+          style="
+            width:100%; padding:13px 46px 13px 16px;
+            background:var(--bg-input); border:1px solid var(--border-strong);
+            border-radius:10px; color:var(--text-primary);
+            font-family:'DM Sans',sans-serif; font-size:15px;
+            outline:none; box-sizing:border-box;
+            transition:border-color 0.2s ease;
+          "
           onkeydown="if(event.key==='Enter')submitAuth()"
           oninput="document.getElementById('authError').style.display='none'" />
-        <button onclick="toggleAuthPw()" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);
-          background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:18px;padding:0;line-height:1">👁</button>
+        <button onclick="toggleAuthPw()" style="
+          position:absolute; right:13px; top:50%; transform:translateY(-50%);
+          background:none; border:none; cursor:pointer;
+          color:var(--text-muted); font-size:18px; padding:0; line-height:1;
+        ">👁</button>
       </div>
-      <p id="authError" style="display:none;color:var(--off);font-size:13px;margin:0">
-        ❌ Password incorreta
-      </p>
+
+      <p id="authError" style="
+        display:none; color:var(--off);
+        font-family:'DM Sans',sans-serif; font-size:13px; margin:0;
+      ">❌ Password incorreta</p>
+
       <button onclick="submitAuth()" style="
-        width:100%;padding:13px;background:linear-gradient(135deg,#f97316,#facc15);
-        border:none;border-radius:10px;font-family:'Syne',sans-serif;
-        font-size:15px;font-weight:700;color:#000;cursor:pointer;
-        transition:opacity 0.2s ease;
-      " onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">
+        width:100%; padding:14px;
+        background:linear-gradient(135deg,#f97316,#facc15);
+        border:none; border-radius:10px;
+        font-family:'Syne',sans-serif; font-size:15px; font-weight:700;
+        color:#000; cursor:pointer; transition:opacity 0.2s ease;
+        letter-spacing:0.3px;
+      " onmouseover="this.style.opacity='0.88'" onmouseout="this.style.opacity='1'">
         Entrar
       </button>
-      <p style="font-size:12px;color:var(--text-muted);margin:0">
-        FluxLight PAP 2025/2026
-      </p>
+
+      <p style="
+        font-family:'DM Sans',sans-serif; font-size:12px;
+        color:var(--text-muted); margin:0;
+      ">FluxLight PAP 2025/2026</p>
     </div>`;
 
   document.body.appendChild(overlay);
+
+  // Animação de entrada do card (igual ao splash)
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      const card = document.getElementById("authCard");
+      if (card) { card.style.opacity = "1"; card.style.transform = "translateY(0)"; }
+    });
+  });
+
   setTimeout(() => {
     const inp = document.getElementById("authInput");
     if (inp) inp.focus();
-  }, 100);
+  }, 120);
 }
 
 function toggleAuthPw() {
