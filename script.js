@@ -9,7 +9,7 @@
 const APP_PASSWORD = "2026";
 
 // ❗ IP do ESP32 (ver no Serial Monitor após gravar)
-const ESP32_IP = "http://192.168.1.116";
+const ESP32_IP = "http://192.168.1.116"; 
 
 // ❗ IPs das 5 lâmpadas Shelly RGBW E27
 const SHELLY_IPS = [
