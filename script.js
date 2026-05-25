@@ -6,7 +6,7 @@
    ─────────────────────────────────────────────────────────────── */
 
 // 🔒 PASSWORD DA APP — alterar aqui
-const APP_PASSWORD = "fluxlight2025";
+const APP_PASSWORD = "2026";
 
 // ❗ IP do ESP32 (ver no Serial Monitor após gravar)
 const ESP32_IP = "http://192.168.1.116";
