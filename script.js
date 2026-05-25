@@ -9,7 +9,7 @@
 const APP_PASSWORD = "fluxlight2025";
 
 // ❗ IP do ESP32 (ver no Serial Monitor após gravar)
-const ESP32_IP = "http://192.168.1.115";
+const ESP32_IP = "http://192.168.1.116";
 
 // ❗ IPs das 5 lâmpadas Shelly RGBW E27
 const SHELLY_IPS = [
