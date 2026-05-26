@@ -42,7 +42,7 @@
 
 <!-- ══ SIDEBAR ══ -->
 <aside class="sidebar" id="sidebar">
-  <div class="sidebar-logo">
+  <div class="sidebar-logo" onclick="location.reload()" style="cursor:pointer;" title="Recarregar app">
     <div class="logo-icon">
       <svg viewBox="0 0 32 32" fill="none">
         <circle cx="16" cy="16" r="15" stroke="url(#g1)" stroke-width="2"/>
@@ -114,7 +114,7 @@
       <p class="page-sub" id="pageSub"></p>
     </div>
     <div class="topbar-right">
-      <button class="btn-icon" onclick="checkConnection()"><i data-lucide="refresh-cw"></i></button>
+      <button class="btn-icon" onclick="location.reload()" title="Reiniciar app"><i data-lucide="refresh-cw"></i></button>
       <button class="btn-icon master-toggle" id="masterBtn" onclick="masterToggle()"><i data-lucide="power"></i></button>
     </div>
   </header>
@@ -285,48 +285,39 @@
     <div class="flags-grid">
       <button class="flag-card" id="flag-pt" onclick="applyFlag('pt')">
         <div class="flag-preview pt-flag"></div>
-        <span class="flag-emoji">🇵🇹</span>
-        <span data-i18n="flag_pt">Portugal</span>
+        <span class="flag-name">🇵🇹 Portugal</span>
       </button>
       <button class="flag-card" id="flag-br" onclick="applyFlag('br')">
         <div class="flag-preview br-flag"></div>
-        <span class="flag-emoji">🇧🇷</span>
-        <span data-i18n="flag_br">Brasil</span>
+        <span class="flag-name">🇧🇷 Brasil</span>
       </button>
       <button class="flag-card" id="flag-es" onclick="applyFlag('es')">
         <div class="flag-preview es-flag"></div>
-        <span class="flag-emoji">🇪🇸</span>
-        <span data-i18n="flag_es">Espanha</span>
+        <span class="flag-name">🇪🇸 Espanha</span>
       </button>
       <button class="flag-card" id="flag-fr" onclick="applyFlag('fr')">
         <div class="flag-preview fr-flag"></div>
-        <span class="flag-emoji">🇫🇷</span>
-        <span data-i18n="flag_fr">França</span>
+        <span class="flag-name">🇫🇷 França</span>
       </button>
       <button class="flag-card" id="flag-de" onclick="applyFlag('de')">
         <div class="flag-preview de-flag"></div>
-        <span class="flag-emoji">🇩🇪</span>
-        <span data-i18n="flag_de">Alemanha</span>
+        <span class="flag-name">🇩🇪 Alemanha</span>
       </button>
       <button class="flag-card" id="flag-it" onclick="applyFlag('it')">
         <div class="flag-preview it-flag"></div>
-        <span class="flag-emoji">🇮🇹</span>
-        <span data-i18n="flag_it">Itália</span>
+        <span class="flag-name">🇮🇹 Itália</span>
       </button>
       <button class="flag-card" id="flag-gb" onclick="applyFlag('gb')">
         <div class="flag-preview gb-flag"></div>
-        <span class="flag-emoji">🇬🇧</span>
-        <span data-i18n="flag_gb">Reino Unido</span>
+        <span class="flag-name">🇬🇧 Reino Unido</span>
       </button>
       <button class="flag-card" id="flag-us" onclick="applyFlag('us')">
         <div class="flag-preview us-flag"></div>
-        <span class="flag-emoji">🇺🇸</span>
-        <span data-i18n="flag_us">EUA</span>
+        <span class="flag-name">🇺🇸 EUA</span>
       </button>
       <button class="flag-card" id="flag-jp" onclick="applyFlag('jp')">
         <div class="flag-preview jp-flag"></div>
-        <span class="flag-emoji">🇯🇵</span>
-        <span data-i18n="flag_jp">Japão</span>
+        <span class="flag-name">🇯🇵 Japão</span>
       </button>
     </div>
     <button class="btn-stop-effect" onclick="stopFlag()">
@@ -367,6 +358,58 @@
       <div id="shellyIpFields"></div>
     </div>
     <div class="settings-card">
+      <h3>🔑 Password Wi-Fi</h3>
+      <p class="settings-note">Alterar em <code>esp32_code.ino</code></p>
+      <div class="settings-field">
+        <label>Password atual</label>
+        <div class="settings-row">
+          <code class="code-tag" id="displayWifiPass">••••••••</code>
+          <button class="btn-edit" onclick="toggleWifiPass()">Mostrar</button>
+        </div>
+        <input type="text" class="settings-input hidden" id="wifiPassInput" placeholder="Nova password" onblur="saveWifiPass(this.value)" />
+      </div>
+    </div>
+    <div class="settings-card">
+      <h3>📶 Modo Offline</h3>
+      <p class="settings-note">Quando o ESP32 não está acessível, a interface continua a funcionar em modo demonstração.</p>
+      <div class="settings-field">
+        <label>Estado</label>
+        <div class="settings-row">
+          <label class="toggle-switch">
+            <input type="checkbox" id="offlineMode" onchange="toggleOfflineMode(this.checked)" />
+            <span class="toggle-track"></span>
+          </label>
+          <span id="offlineModeLabel" style="font-size:13px;color:var(--text-secondary)">Desativado</span>
+        </div>
+      </div>
+    </div>
+    <div class="settings-card">
+      <h3>🔐 Password de Acesso</h3>
+      <p class="settings-note">Password utilizada para entrar na app FluxLight. Por defeito: <code>1234</code></p>
+      <div class="settings-field">
+        <label>Password atual</label>
+        <div class="settings-row">
+          <input type="password" class="settings-input" id="currentPassInput" placeholder="Password atual" style="margin-top:0;" />
+        </div>
+      </div>
+      <div class="settings-field">
+        <label>Nova password</label>
+        <div class="settings-row">
+          <input type="password" class="settings-input" id="newPassInput" placeholder="Nova password (mín. 4 caracteres)" style="margin-top:0;" />
+        </div>
+      </div>
+      <div class="settings-field">
+        <label>Confirmar nova password</label>
+        <div class="settings-row">
+          <input type="password" class="settings-input" id="confirmPassInput" placeholder="Repetir nova password" style="margin-top:0;" />
+        </div>
+      </div>
+      <div style="margin-top:14px;">
+        <button class="btn-edit" style="padding:10px 20px;font-size:14px;" onclick="changeAppPassword()">💾 Guardar Password</button>
+      </div>
+      <p id="passChangeMsg" style="margin-top:10px;font-size:13px;display:none;"></p>
+    </div>
+    <div class="settings-card">
       <h3>🔧 <span data-i18n="esp_config">Configuração Hardware</span></h3>
       <p class="settings-note"><span data-i18n="edit_in">Alterar em</span> <code>esp32_code.ino</code></p>
       <div class="settings-field">
@@ -376,86 +419,6 @@
       <div class="settings-field">
         <label data-i18n="gpio">GPIO da fita LED</label>
         <code class="code-tag">#define LED_PIN 13</code>
-      </div>
-    </div>
-
-    <div class="settings-card">
-      <h3>🎙️ Controlo por Voz</h3>
-      <p class="settings-note">Usa a <strong>Web Speech API</strong> do browser — sem chave nem servidor externo.</p>
-      <div class="settings-field">
-        <label>Estado</label>
-        <div class="voice-status-row" id="voiceStatusRow">
-          <span class="dot"></span>
-          <span id="voiceStatusText">A verificar suporte...</span>
-        </div>
-      </div>
-      <div class="settings-field">
-        <label>Browsers compatíveis</label>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px">
-          <span class="code-tag" style="flex:none">✅ Chrome</span>
-          <span class="code-tag" style="flex:none">✅ Edge</span>
-          <span class="code-tag" style="flex:none">✅ Safari iOS 14.5+</span>
-          <span class="code-tag" style="flex:none">❌ Firefox</span>
-        </div>
-      </div>
-      <div class="settings-field">
-        <label>Exemplos de comandos</label>
-        <div style="display:flex;flex-direction:column;gap:6px;margin-top:4px">
-          <code class="code-tag">"Ligar fita" / "Desligar led"</code>
-          <code class="code-tag">"Efeito arco-íris" / "Parar efeito"</code>
-          <code class="code-tag">"Cor vermelha" / "Cor branca"</code>
-          <code class="code-tag">"Brilho máximo" / "Brilho mínimo"</code>
-          <code class="code-tag">"Bandeira Portugal" / "Cena festa"</code>
-          <code class="code-tag">"Ligar lâmpadas" / "Desligar tudo"</code>
-        </div>
-      </div>
-      <div class="settings-field">
-        <label>Nota</label>
-        <p class="settings-note" style="margin:0">
-          Requer <strong>HTTPS</strong> ou <code>localhost</code>. Em <code>file://</code> o microfone é bloqueado pelo browser.
-          Usa <strong>GitHub Pages</strong> para garantir HTTPS.
-        </p>
-      </div>
-    </div>
-
-    <div class="settings-card">
-      <h3>🔒 Autenticação</h3>
-      <p class="settings-note">Password definida em <code>script.js</code> → <code>APP_PASSWORD</code>. A sessão expira ao fechar o browser.</p>
-      <div class="settings-field">
-        <label>Password atual</label>
-        <div class="settings-row">
-          <code class="code-tag" id="displayPassword">••••••••••••••</code>
-          <button class="btn-edit" onclick="toggleShowPassword(this)">Mostrar</button>
-        </div>
-      </div>
-      <div class="settings-field">
-        <label>Sessão</label>
-        <div class="voice-status-row ok">
-          <span class="dot"></span>
-          <span>Autenticado — sessão ativa até fechar o browser</span>
-        </div>
-      </div>
-      <div class="settings-field" style="margin-top:4px">
-        <button class="btn-stop-effect" onclick="lockApp()" style="width:100%;justify-content:center">
-          <i data-lucide="lock"></i> Bloquear App / Terminar Sessão
-        </button>
-      </div>
-    </div>
-
-    <div class="settings-card">
-      <h3>💾 Modo Offline</h3>
-      <p class="settings-note">O último estado é guardado em <code>localStorage</code> e restaurado automaticamente se o ESP32 não responder.</p>
-      <div class="settings-field">
-        <label>Dados guardados</label>
-        <div class="voice-status-row ok" id="offlineStateRow">
-          <span class="dot"></span>
-          <span id="offlineStateText">A verificar...</span>
-        </div>
-      </div>
-      <div class="settings-field" style="margin-top:4px">
-        <button class="btn-stop-effect" onclick="clearOfflineState()" style="width:100%;justify-content:center">
-          <i data-lucide="trash-2"></i> Limpar estado guardado
-        </button>
       </div>
     </div>
   </section>
@@ -570,7 +533,7 @@
     <div class="about-card school-card">
       <div class="school-info">
         <strong>Agrupamento de Escolas de Montemor-o-Velho</strong>
-        <small>Cofinanciado pela União Europeia · Portugal 2030</small>
+        <small><span data-i18n="school_sub">Cofinanciado pela União Europeia · Portugal 2030</span></small>
       </div>
     </div>
 
