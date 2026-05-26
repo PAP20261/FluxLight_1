@@ -1,15 +1,11 @@
 /* ═══════════════════════════════════════════════════════════════
-   FluxLight — script.js  v3.0
-   Adições: Offline Mode · Auth · Voice Control
+   FluxLight — script.js  v2.0  FINAL
    ═══════════════════════════════════════════════════════════════
    ⚙️  CONFIGURAÇÃO — alterar aqui
    ─────────────────────────────────────────────────────────────── */
 
-// 🔒 PASSWORD DA APP — alterar aqui
-const APP_PASSWORD = "2026";
-
 // ❗ IP do ESP32 (ver no Serial Monitor após gravar)
-const ESP32_IP = "http://192.168.1.116"; 
+const ESP32_IP = "http://192.168.1.115";
 
 // ❗ IPs das 5 lâmpadas Shelly RGBW E27
 const SHELLY_IPS = [
@@ -293,30 +289,18 @@ function initSplash() {
    INICIALIZAÇÃO
    ═══════════════════════════════════════════════════════════════ */
 document.addEventListener("DOMContentLoaded", () => {
-  // 1. Autenticação — bloqueia imediatamente se não autenticado
-  checkAuth();
-
-  // 2. Carregar estado offline (restaura UI sem precisar do ESP32)
-  loadState();
-
-  // 3. Construir UI dinâmica
+  initSplash();
   buildBulbCards();
   buildShellyIpFields();
   syncUI();
   applyTranslations();
 
-  // 4. Splash + ligação ao ESP32 (com delay para o splash terminar)
-  initSplash();
   setTimeout(() => {
     checkConnection();
     if (window.lucide) lucide.createIcons();
   }, 3400);
 
   setInterval(checkConnection, 15000);
-
-  // 5. Controlo por voz
-  initVoiceControl();
-  injectVoiceButton();
 });
 
 /* ═══════════════════════════════════════════════════════════════
@@ -870,589 +854,118 @@ function capitalize(str) {
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   MÓDULO 1 — OFFLINE MODE (localStorage)
-   Guarda o último estado e restaura-o se o ESP32 não responder.
+   DEFINIÇÕES — Password Wi-Fi + Modo Offline
    ═══════════════════════════════════════════════════════════════ */
-const LS_KEY = "fluxlight_state_v1";
 
-function saveState() {
-  try {
-    const snapshot = {
-      led:    { ...state.led },
-      bulbs:  state.bulbs.map(b => ({ ...b })),
-      effect: state.effect,
-      flag:   state.flag,
-    };
-    localStorage.setItem(LS_KEY, JSON.stringify(snapshot));
-  } catch (_) {}
-}
+let wifiPassVisible = false;
+let offlineModeActive = false;
 
-function loadState() {
-  try {
-    const raw = localStorage.getItem(LS_KEY);
-    if (!raw) return false;
-    const saved = JSON.parse(raw);
-
-    // Restaurar LED
-    if (saved.led) {
-      Object.assign(state.led, saved.led);
-      const tog = document.getElementById("ledToggle");
-      if (tog) tog.checked = state.led.on;
-      const col = document.getElementById("ledColor");
-      if (col) col.value = state.led.color;
-      const br  = document.getElementById("ledBrightness");
-      if (br)  br.value = state.led.brightness;
-      updateBrightLabel(state.led.brightness, "ledBrightVal");
-    }
-
-    // Restaurar Lâmpadas
-    if (saved.bulbs) {
-      saved.bulbs.forEach((b, i) => {
-        if (i >= state.bulbs.length) return;
-        Object.assign(state.bulbs[i], b);
-        const tog = document.getElementById(`bulb${i+1}Toggle`);
-        if (tog) tog.checked = b.on;
-        const col = document.getElementById(`bulb${i+1}Color`);
-        if (col) col.value = b.color;
-        const br  = document.getElementById(`bulb${i+1}Brightness`);
-        if (br)  br.value = b.brightness;
-        updateBrightLabel(b.brightness, `bulb${i+1}BrightVal`);
-      });
-    }
-
-    // Restaurar efeito ativo
-    if (saved.effect) {
-      state.effect = saved.effect;
-      document.getElementById("statEffect").textContent = capitalize(saved.effect);
-      const card = document.getElementById(`fx-${saved.effect}`);
-      if (card) card.classList.add("active");
-    }
-
-    // Restaurar bandeira ativa
-    if (saved.flag) {
-      state.flag = saved.flag;
-      const fi = FLAG_DATA[saved.flag];
-      if (fi) document.getElementById("statFlag").textContent = fi.name;
-      const fc = document.getElementById(`flag-${saved.flag}`);
-      if (fc) fc.classList.add("active");
-    }
-
-    updateColorBars();
-    syncUI();
-    showOfflineBanner();
-    return true;
-  } catch (_) { return false; }
-}
-
-function showOfflineBanner() {
-  let banner = document.getElementById("offlineBanner");
-  if (!banner) {
-    banner = document.createElement("div");
-    banner.id = "offlineBanner";
-    banner.style.cssText = `
-      position:fixed; bottom:70px; right:24px; z-index:998;
-      background:var(--bg-card); border:1px solid rgba(250,204,21,0.4);
-      border-radius:10px; padding:10px 16px; font-size:13px;
-      color:var(--accent2); display:flex; align-items:center; gap:8px;
-      box-shadow:0 4px 20px rgba(0,0,0,0.5); animation:fadeIn 0.3s ease;
-    `;
-    banner.innerHTML = `<span>📴</span><span id="offlineBannerText">Modo offline — último estado restaurado</span>
-      <button onclick="document.getElementById('offlineBanner').remove()"
-        style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px;line-height:1;margin-left:4px">×</button>`;
-    document.body.appendChild(banner);
-    setTimeout(() => { if (banner.parentNode) banner.remove(); }, 6000);
-  }
-}
-
-// Patch nas funções existentes para guardar estado automaticamente
-// Sobrescreve toggleLED para chamar saveState()
-const _origToggleLED = toggleLED;
-toggleLED = async function(isOn) {
-  await _origToggleLED(isOn);
-  saveState();
-};
-
-const _origApplyEffect = applyEffect;
-applyEffect = async function(name) {
-  await _origApplyEffect(name);
-  saveState();
-};
-
-const _origApplyFlag = applyFlag;
-applyFlag = async function(code) {
-  await _origApplyFlag(code);
-  saveState();
-};
-
-const _origApplyLEDColor = applyLEDColor;
-applyLEDColor = async function() {
-  await _origApplyLEDColor();
-  saveState();
-};
-
-const _origToggleBulb = toggleBulb;
-toggleBulb = async function(index, isOn) {
-  await _origToggleBulb(index, isOn);
-  saveState();
-};
-
-/* ═══════════════════════════════════════════════════════════════
-   MÓDULO 2 — AUTENTICAÇÃO BÁSICA (sessionStorage)
-   A password fica em APP_PASSWORD no topo do ficheiro.
-   A sessão expira quando o browser é fechado.
-   ═══════════════════════════════════════════════════════════════ */
-const AUTH_KEY = "fluxauth_v1";
-
-function checkAuth() {
-  if (sessionStorage.getItem(AUTH_KEY) === "1") return true;
-  showLoginOverlay();
-  return false;
-}
-
-function showLoginOverlay() {
-  document.body.style.overflow = "hidden";
-
-  const overlay = document.createElement("div");
-  overlay.id = "authOverlay";
-  overlay.style.cssText = `
-    position:fixed; inset:0; z-index:10000;
-    background:var(--bg-base);
-    display:flex; align-items:center; justify-content:center;
-  `;
-
-  // Fundo radial igual ao splash
-  overlay.innerHTML = `
-    <div style="position:absolute;inset:0;
-      background:radial-gradient(ellipse at 50% 40%, rgba(249,115,22,0.10) 0%, transparent 70%);
-      pointer-events:none;"></div>
-
-    <div id="authCard" style="
-      position:relative; z-index:1;
-      background:var(--bg-card); border:1px solid var(--border-strong);
-      border-radius:20px; padding:40px 36px; width:340px;
-      display:flex; flex-direction:column; align-items:center; gap:20px;
-      text-align:center;
-      opacity:0; transform:translateY(24px);
-      transition: opacity 0.5s ease, transform 0.5s ease;
-    ">
-      <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
-        <circle cx="32" cy="32" r="30" stroke="url(#authG1)" stroke-width="2"/>
-        <path d="M32 10 C18 10 12 20 12 28 C12 38 18 45 24 47 L24 52 L40 52 L40 47 C46 45 52 38 52 28 C52 20 46 10 32 10Z" fill="url(#authG2)"/>
-        <rect x="24" y="52" width="16" height="4" rx="2" fill="url(#authG2)"/>
-        <defs>
-          <linearGradient id="authG1" x1="0" y1="0" x2="64" y2="64">
-            <stop offset="0%" stop-color="#f97316"/><stop offset="100%" stop-color="#facc15"/>
-          </linearGradient>
-          <linearGradient id="authG2" x1="0" y1="0" x2="64" y2="64">
-            <stop offset="0%" stop-color="#fb923c"/><stop offset="100%" stop-color="#fde047"/>
-          </linearGradient>
-        </defs>
-      </svg>
-
-      <div>
-        <h2 style="
-          font-family:'Syne',sans-serif; font-size:32px; font-weight:800;
-          letter-spacing:-1.5px; margin:0 0 6px;
-          background:linear-gradient(135deg,#f97316,#facc15);
-          -webkit-background-clip:text; -webkit-text-fill-color:transparent;
-          background-clip:text;
-        ">FluxLight</h2>
-        <p style="
-          font-family:'DM Sans',sans-serif; font-size:13px;
-          color:var(--text-secondary); margin:0; letter-spacing:0.3px;
-        ">Introduz a password para continuar</p>
-      </div>
-
-      <div style="width:100%; position:relative;">
-        <input type="password" id="authInput" placeholder="Password"
-          style="
-            width:100%; padding:13px 46px 13px 16px;
-            background:var(--bg-input); border:1px solid var(--border-strong);
-            border-radius:10px; color:var(--text-primary);
-            font-family:'DM Sans',sans-serif; font-size:15px;
-            outline:none; box-sizing:border-box;
-            transition:border-color 0.2s ease;
-          "
-          onkeydown="if(event.key==='Enter')submitAuth()"
-          oninput="document.getElementById('authError').style.display='none'" />
-        <button onclick="toggleAuthPw()" style="
-          position:absolute; right:13px; top:50%; transform:translateY(-50%);
-          background:none; border:none; cursor:pointer;
-          color:var(--text-muted); font-size:18px; padding:0; line-height:1;
-        ">👁</button>
-      </div>
-
-      <p id="authError" style="
-        display:none; color:var(--off);
-        font-family:'DM Sans',sans-serif; font-size:13px; margin:0;
-      ">❌ Password incorreta</p>
-
-      <button onclick="submitAuth()" style="
-        width:100%; padding:14px;
-        background:linear-gradient(135deg,#f97316,#facc15);
-        border:none; border-radius:10px;
-        font-family:'Syne',sans-serif; font-size:15px; font-weight:700;
-        color:#000; cursor:pointer; transition:opacity 0.2s ease;
-        letter-spacing:0.3px;
-      " onmouseover="this.style.opacity='0.88'" onmouseout="this.style.opacity='1'">
-        Entrar
-      </button>
-
-      <p style="
-        font-family:'DM Sans',sans-serif; font-size:12px;
-        color:var(--text-muted); margin:0;
-      ">FluxLight PAP 2025/2026</p>
-    </div>`;
-
-  document.body.appendChild(overlay);
-
-  // Animação de entrada do card (igual ao splash)
-  requestAnimationFrame(() => {
-    requestAnimationFrame(() => {
-      const card = document.getElementById("authCard");
-      if (card) { card.style.opacity = "1"; card.style.transform = "translateY(0)"; }
-    });
-  });
-
-  setTimeout(() => {
-    const inp = document.getElementById("authInput");
-    if (inp) inp.focus();
-  }, 120);
-}
-
-function toggleAuthPw() {
-  const inp = document.getElementById("authInput");
-  if (!inp) return;
-  inp.type = inp.type === "password" ? "text" : "password";
-}
-
-function submitAuth() {
-  const inp = document.getElementById("authInput");
-  if (!inp) return;
-  const val = inp.value.trim();
-  if (val === APP_PASSWORD) {
-    sessionStorage.setItem(AUTH_KEY, "1");
-    const overlay = document.getElementById("authOverlay");
-    if (overlay) {
-      overlay.style.opacity = "0";
-      overlay.style.transition = "opacity 0.4s ease";
-      setTimeout(() => {
-        overlay.remove();
-        // Animação de entrada na main após login
-        const main = document.getElementById("main");
-        const sidebar = document.getElementById("sidebar");
-        if (main) {
-          main.style.opacity = "0";
-          main.style.transform = "translateY(18px)";
-          main.style.transition = "opacity 0.5s ease, transform 0.5s ease";
-          requestAnimationFrame(() => {
-            main.style.opacity = "1";
-            main.style.transform = "translateY(0)";
-          });
-        }
-        if (sidebar) {
-          sidebar.style.opacity = "0";
-          sidebar.style.transition = "opacity 0.5s 0.1s ease";
-          requestAnimationFrame(() => { sidebar.style.opacity = "1"; });
-        }
-      }, 400);
-    }
-    document.body.style.overflow = "";
+function toggleWifiPass() {
+  const display = document.getElementById("displayWifiPass");
+  const input   = document.getElementById("wifiPassInput");
+  wifiPassVisible = !wifiPassVisible;
+  if (wifiPassVisible) {
+    input.classList.remove("hidden");
+    input.focus();
+    display.textContent = input.value || "••••••••";
   } else {
-    const err = document.getElementById("authError");
-    if (err) err.style.display = "block";
-    inp.value = "";
-    inp.style.borderColor = "var(--off)";
-    setTimeout(() => { inp.style.borderColor = ""; }, 1500);
-    inp.focus();
+    input.classList.add("hidden");
+    display.textContent = "••••••••";
+  }
+}
+
+function saveWifiPass(value) {
+  const display = document.getElementById("displayWifiPass");
+  if (value) {
+    display.textContent = "••••••••";
+    showToast("⚠️ Alterar no esp32_code.ino e regravar", "info", 4000);
+  }
+  document.getElementById("wifiPassInput").classList.add("hidden");
+  wifiPassVisible = false;
+}
+
+function toggleOfflineMode(isOn) {
+  offlineModeActive = isOn;
+  const label = document.getElementById("offlineModeLabel");
+  if (label) label.textContent = isOn ? "Ativado — modo demonstração" : "Desativado";
+  showToast(isOn ? "📶 Modo offline ativado" : "📶 Modo offline desativado", "info");
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   PASSWORD DE ACESSO À APP
+   ═══════════════════════════════════════════════════════════════ */
+
+function editAppPass() {
+  const input = document.getElementById("appPassInput");
+  input.classList.remove("hidden");
+  input.value = "";
+  input.focus();
+}
+
+function saveAppPass(value) {
+  const input   = document.getElementById("appPassInput");
+  const display = document.getElementById("displayAppPass");
+  input.classList.add("hidden");
+  if (value && value.length >= 4) {
+    localStorage.setItem("fluxlight_pass", value);
+    display.textContent = "••••••••";
+    showToast("🔐 Password de acesso atualizada", "success");
+  } else if (value) {
+    showToast("❌ Password demasiado curta (mín. 4 caracteres)", "error");
   }
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   MÓDULO 3 — CONTROLO POR VOZ (Web Speech API)
-   Funciona no Chrome, Edge, Safari. Não funciona no Firefox.
-   Requer HTTPS ou localhost.
+   PASSWORD DE ACESSO — Sistema completo
    ═══════════════════════════════════════════════════════════════ */
-const voice = {
-  recognition: null,
-  active:       false,
-  supported:    false,
-  btnEl:        null,
-};
 
-// Mapa de comandos — o texto reconhecido é comparado com estas frases
-// em todas as 5 línguas
-const VOICE_COMMANDS = [
-  // Fita LED
-  { match: ["ligar fita","ligar led","turn on strip","turn on led","led einschalten","allumer bandeau","encender tira"],
-    action: () => { document.getElementById("ledToggle").checked = true; toggleLED(true); } },
-  { match: ["desligar fita","desligar led","turn off strip","turn off led","led ausschalten","éteindre bandeau","apagar tira","apagar led"],
-    action: () => { document.getElementById("ledToggle").checked = false; toggleLED(false); } },
+const DEFAULT_PASS = "1234";
 
-  // Lâmpadas
-  { match: ["ligar lâmpadas","ligar lampadas","turn on bulbs","lampen einschalten","allumer ampoules","encender bombillas"],
-    action: () => shellyAllOn() },
-  { match: ["desligar lâmpadas","desligar lampadas","turn off bulbs","lampen ausschalten","éteindre ampoules","apagar lâmpadas","apagar lampadas"],
-    action: () => shellyAllOff() },
+function getAppPassword() {
+  return localStorage.getItem("fluxlight_pass") || DEFAULT_PASS;
+}
 
-  // Controlo mestre
-  { match: ["ligar tudo","turn on all","alles einschalten","tout allumer","encender todo"],
-    action: () => { if (!state.master) masterToggle(); } },
-  { match: ["desligar tudo","turn off all","alles ausschalten","tout éteindre","apagar tudo"],
-    action: () => { if (state.master) masterToggle(); } },
+function changeAppPassword() {
+  const current  = document.getElementById("currentPassInput").value;
+  const newPass  = document.getElementById("newPassInput").value;
+  const confirm  = document.getElementById("confirmPassInput").value;
+  const msgEl    = document.getElementById("passChangeMsg");
 
-  // Efeitos
-  { match: ["arco-íris","arco iris","rainbow","regenbogen","arc-en-ciel"],
-    action: () => applyEffect("rainbow") },
-  { match: ["disco","discoteca"],
-    action: () => applyEffect("disco") },
-  { match: ["fogo","fire","feuer","incendie"],
-    action: () => applyEffect("fire") },
-  { match: ["pulsar","pulse","pulsieren","pulsation"],
-    action: () => applyEffect("pulse") },
-  { match: ["onda","wave","welle","vague"],
-    action: () => applyEffect("wave") },
-  { match: ["fade","transição","transition"],
-    action: () => applyEffect("fade") },
-  { match: ["parar efeito","stop effect","effekt stoppen","arrêter effet","parar efecto"],
-    action: () => stopEffect() },
+  msgEl.style.display = "block";
 
-  // Cores
-  { match: ["cor vermelha","vermelho","red","rot","rouge","rojo","color rojo"],
-    action: () => setColor("led","#ff0000") },
-  { match: ["cor laranja","laranja","orange","naranja"],
-    action: () => setColor("led","#ff6a00") },
-  { match: ["cor amarela","amarelo","yellow","gelb","jaune","amarillo"],
-    action: () => setColor("led","#ffff00") },
-  { match: ["cor verde","verde","green","grün","vert"],
-    action: () => setColor("led","#00ff00") },
-  { match: ["cor azul","azul","blue","blau","bleu"],
-    action: () => setColor("led","#0000ff") },
-  { match: ["cor branca","branco","white","weiß","blanc","blanco"],
-    action: () => setColor("led","#ffffff") },
-  { match: ["cor roxa","roxo","purple","lila","violet","violeta"],
-    action: () => setColor("led","#8a2be2") },
-
-  // Brilho
-  { match: ["brilho máximo","brilho maximo","maximum brightness","volle helligkeit","luminosité max"],
-    action: () => { document.getElementById("ledBrightness").value=255; applyLEDBrightness(255); } },
-  { match: ["brilho mínimo","brilho minimo","minimum brightness","mindesthelligkeit","luminosité min"],
-    action: () => { document.getElementById("ledBrightness").value=30;  applyLEDBrightness(30); } },
-  { match: ["brilho médio","brilho medio","medium brightness","mittlere helligkeit","luminosité moyenne"],
-    action: () => { document.getElementById("ledBrightness").value=128; applyLEDBrightness(128); } },
-
-  // Cenas
-  { match: ["cena relaxar","modo relaxar","relax","entspannen","détente"],
-    action: () => applyScene("relax") },
-  { match: ["cena foco","modo foco","focus mode","fokusmodus","mode concentration"],
-    action: () => applyScene("focus") },
-  { match: ["cena festa","modo festa","party mode","party","fête"],
-    action: () => applyScene("party") },
-  { match: ["cena noite","modo noite","night mode","nachtmodus","mode nuit"],
-    action: () => applyScene("night") },
-
-  // Bandeiras
-  { match: ["bandeira portugal","flag portugal"],    action: () => applyFlag("pt") },
-  { match: ["bandeira brasil","flag brazil"],        action: () => applyFlag("br") },
-  { match: ["bandeira espanha","flag spain"],        action: () => applyFlag("es") },
-  { match: ["bandeira frança","bandeira franca","flag france"], action: () => applyFlag("fr") },
-  { match: ["bandeira alemanha","flag germany"],     action: () => applyFlag("de") },
-  { match: ["bandeira itália","bandeira italia","flag italy"],  action: () => applyFlag("it") },
-  { match: ["bandeira reino unido","flag uk","flag united kingdom"], action: () => applyFlag("gb") },
-  { match: ["bandeira eua","bandeira americana","flag usa","flag america"], action: () => applyFlag("us") },
-  { match: ["bandeira japão","bandeira japao","flag japan"],   action: () => applyFlag("jp") },
-  { match: ["parar bandeira","stop flag"],           action: () => stopFlag() },
-];
-
-function initVoiceControl() {
-  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SpeechRecognition) {
-    console.warn("FluxLight: Web Speech API não suportada neste browser.");
+  if (!current || !newPass || !confirm) {
+    msgEl.style.color = "var(--off)";
+    msgEl.textContent = "❌ Preenche todos os campos.";
     return;
   }
-  voice.supported = true;
 
-  const rec = new SpeechRecognition();
-  rec.lang = state.lang === "pt" ? "pt-PT"
-           : state.lang === "en" ? "en-US"
-           : state.lang === "de" ? "de-DE"
-           : state.lang === "fr" ? "fr-FR"
-           : state.lang === "es" ? "es-ES"
-           : "pt-PT";
-  rec.continuous     = false;
-  rec.interimResults = false;
-  rec.maxAlternatives = 3;
-
-  rec.onstart = () => {
-    voice.active = true;
-    updateVoiceBtn(true);
-    showToast("🎙️ A ouvir...", "info", 5000);
-  };
-
-  rec.onend = () => {
-    voice.active = false;
-    updateVoiceBtn(false);
-  };
-
-  rec.onerror = (e) => {
-    voice.active = false;
-    updateVoiceBtn(false);
-    if (e.error === "not-allowed") showToast("❌ Microfone bloqueado — permite nas definições do browser", "error", 5000);
-    else if (e.error !== "aborted") showToast(`❌ Voz: ${e.error}`, "error");
-  };
-
-  rec.onresult = (event) => {
-    // Recolhe todas as alternativas e escolhe a que melhor coincide
-    const alternatives = [];
-    for (let i = 0; i < event.results[0].length; i++) {
-      alternatives.push(event.results[0][i].transcript.toLowerCase().trim());
-    }
-
-    let matched = false;
-    for (const alt of alternatives) {
-      for (const cmd of VOICE_COMMANDS) {
-        if (cmd.match.some(phrase => alt.includes(phrase))) {
-          showToast(`🎙️ "${alt}"`, "success", 3000);
-          cmd.action();
-          matched = true;
-          break;
-        }
-      }
-      if (matched) break;
-    }
-
-    if (!matched) {
-      showToast(`🎙️ Não reconhecido: "${alternatives[0]}"`, "info", 3000);
-    }
-  };
-
-  voice.recognition = rec;
-}
-
-function toggleVoice() {
-  if (!voice.supported) {
-    showToast("❌ Voz não suportada — usa Chrome ou Safari", "error", 4000);
+  if (current !== getAppPassword()) {
+    msgEl.style.color = "var(--off)";
+    msgEl.textContent = "❌ Password atual incorreta.";
     return;
   }
-  if (voice.active) {
-    voice.recognition.stop();
-  } else {
-    // Atualizar língua antes de iniciar
-    const langMap = { pt:"pt-PT", en:"en-US", de:"de-DE", fr:"fr-FR", es:"es-ES" };
-    voice.recognition.lang = langMap[state.lang] || "pt-PT";
-    voice.recognition.start();
-  }
-}
 
-function updateVoiceBtn(isListening) {
-  const btn = document.getElementById("voiceBtn");
-  if (!btn) return;
-  if (isListening) {
-    btn.classList.add("voice-active");
-    btn.title = "A ouvir... (clica para parar)";
-  } else {
-    btn.classList.remove("voice-active");
-    btn.title = "Controlo por voz";
-  }
-}
-
-// Injetar botão de voz na topbar (chamado no DOMContentLoaded)
-function injectVoiceButton() {
-  const topbarRight = document.querySelector(".topbar-right");
-  if (!topbarRight) return;
-
-  const btn = document.createElement("button");
-  btn.id        = "voiceBtn";
-  btn.className = "btn-icon";
-  btn.title     = "Controlo por voz";
-  btn.onclick   = toggleVoice;
-  btn.innerHTML = `<i data-lucide="mic"></i>`;
-  btn.setAttribute("aria-label", "Controlo por voz");
-
-  // Inserir antes do botão de refresh
-  topbarRight.insertBefore(btn, topbarRight.firstChild);
-  if (window.lucide) lucide.createIcons();
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   FUNÇÕES AUXILIARES DAS DEFINIÇÕES
-   ═══════════════════════════════════════════════════════════════ */
-
-/** Mostra/esconde a password nas definições */
-function toggleShowPassword(btn) {
-  const el = document.getElementById("displayPassword");
-  if (!el) return;
-  if (el.textContent === "••••••••••••••") {
-    el.textContent = APP_PASSWORD;
-    btn.textContent = "Esconder";
-  } else {
-    el.textContent = "••••••••••••••";
-    btn.textContent = "Mostrar";
-  }
-}
-
-/** Termina sessão e volta a mostrar o ecrã de login */
-function lockApp() {
-  sessionStorage.removeItem(AUTH_KEY);
-  showToast("🔒 Sessão terminada", "info", 2000);
-  setTimeout(() => location.reload(), 1500);
-}
-
-/** Apaga o estado offline do localStorage */
-function clearOfflineState() {
-  localStorage.removeItem(LS_KEY);
-  updateOfflineStatusCard();
-  showToast("🗑️ Estado offline apagado", "info");
-}
-
-/** Atualiza os cards de estado nas Definições */
-function updateSettingsCards() {
-  // Voz
-  const voiceRow  = document.getElementById("voiceStatusRow");
-  const voiceText = document.getElementById("voiceStatusText");
-  if (voiceRow && voiceText) {
-    if (voice.supported) {
-      voiceRow.classList.add("ok");
-      voiceText.textContent = "Suportado — clica no microfone 🎙️ na barra superior";
-    } else {
-      voiceRow.classList.remove("ok");
-      voiceText.textContent = "Não suportado — usa Chrome ou Safari";
-    }
+  if (newPass.length < 4) {
+    msgEl.style.color = "var(--off)";
+    msgEl.textContent = "❌ A nova password deve ter pelo menos 4 caracteres.";
+    return;
   }
 
-  // Offline
-  updateOfflineStatusCard();
-}
-
-function updateOfflineStatusCard() {
-  const row  = document.getElementById("offlineStateRow");
-  const text = document.getElementById("offlineStateText");
-  if (!row || !text) return;
-  const raw = localStorage.getItem(LS_KEY);
-  if (raw) {
-    try {
-      const s = JSON.parse(raw);
-      const ledStr  = s.led ? `LED ${s.led.on ? "ON" : "OFF"} · ${s.led.color}` : "";
-      const fxStr   = s.effect ? ` · Efeito: ${capitalize(s.effect)}` : "";
-      const flagStr = s.flag   ? ` · Bandeira: ${s.flag.toUpperCase()}` : "";
-      row.classList.add("ok");
-      text.textContent = `Guardado: ${ledStr}${fxStr}${flagStr}`;
-    } catch (_) {
-      text.textContent = "Dados inválidos — clica em limpar";
-      row.classList.remove("ok");
-    }
-  } else {
-    row.classList.remove("ok");
-    text.textContent = "Nenhum estado guardado ainda";
+  if (newPass !== confirm) {
+    msgEl.style.color = "var(--off)";
+    msgEl.textContent = "❌ As passwords não coincidem.";
+    return;
   }
-}
 
-/* Patch no showSection para atualizar o card de definições ao entrar */
-const _origShowSection = showSection;
-showSection = function(name, navEl) {
-  _origShowSection(name, navEl);
-  if (name === "settings") {
-    updateSettingsCards();
-    if (window.lucide) lucide.createIcons();
-  }
-};
+  localStorage.setItem("fluxlight_pass", newPass);
+  msgEl.style.color = "var(--on)";
+  msgEl.textContent = "✅ Password alterada com sucesso!";
+
+  document.getElementById("currentPassInput").value = "";
+  document.getElementById("newPassInput").value = "";
+  document.getElementById("confirmPassInput").value = "";
+
+  showToast("🔐 Password de acesso atualizada", "success");
+
+  setTimeout(() => { msgEl.style.display = "none"; }, 3000);
+}
