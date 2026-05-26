@@ -142,7 +142,7 @@ body::after {
 
 .splash-sub {
   font-size: 15px;
-  color: var(--text-secondary);
+  color: var(--text-primary);
   letter-spacing: 2px;
   text-transform: uppercase;
   opacity: 0;
@@ -221,17 +221,19 @@ body::after {
   border: 1px solid transparent;
   border-radius: 6px;
   background: none;
-  font-size: 16px;
+  font-size: 13px; font-weight: 600;
+  color: var(--text-primary);
   cursor: pointer;
   transition: all var(--trans);
   display: grid; place-items: center;
-  opacity: 0.5;
+
   line-height: 1;
 }
 
-.lang-btn:hover { opacity: 0.85; background: var(--bg-card); }
+.lang-btn:hover { color: var(--text-primary); background: var(--bg-card); }
 
 .lang-btn.active {
+  color: var(--text-primary);
   opacity: 1;
   border-color: var(--accent);
   background: var(--accent-dim);
@@ -247,7 +249,7 @@ body::after {
 .nav-item {
   display: flex; align-items: center; gap: 12px;
   padding: 10px 14px; border-radius: var(--radius-sm);
-  color: var(--text-secondary);
+  color: var(--text-primary);
   text-decoration: none; font-size: 14px; font-weight: 500;
   transition: all var(--trans); position: relative;
 }
@@ -839,7 +841,7 @@ body::after {
 .about-tagline { color:var(--text-secondary); font-size:15px; }
 
 .about-grid {
-  display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+  display:grid; grid-template-columns:repeat(2,1fr);
   gap:14px; margin-bottom:14px;
 }
 
@@ -1025,4 +1027,45 @@ body::after {
   .quick-grid  { grid-template-columns:1fr 1fr; }
   .flags-grid  { grid-template-columns:repeat(2,1fr); }
   .color-row   { flex-direction:column; align-items:flex-start; }
+}
+
+/* ═══ BANDEIRAS — emoji grande como imagem real ═══ */
+.flag-card {
+  padding: 12px 10px 14px;
+  gap: 6px;
+}
+
+.flag-preview {
+  width: 100%; height: 64px;
+  border-radius: 8px;
+  overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 52px;
+  line-height: 1;
+  margin-bottom: 0;
+  background: none;
+}
+
+.flag-code {
+  font-family: 'Syne', sans-serif;
+  font-size: 11px; font-weight: 700;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.flag-name {
+  font-size: 13px; font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* Grid 5 colunas fixas */
+.flags-grid {
+  grid-template-columns: repeat(5, 1fr) !important;
+}
+
+/* About grid — centrado sem espaço vazio */
+.about-grid {
+  grid-template-columns: repeat(2, minmax(0, 420px)) !important;
+  justify-content: center;
 }
