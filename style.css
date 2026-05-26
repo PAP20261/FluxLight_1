@@ -1,9 +1,6 @@
 /* ═══════════════════════════════════════════════
-   FluxLight — style.css  v3.0
+   FluxLight — style.css  v2.0
    Dark smart lighting UI · Premium design
-   ✅ v3.0: Spotlight bg, cards com sombra/glow,
-           sidebar gradiente, btns ON/OFF com ícones,
-           bandeiras corrigidas, school centrado
    ═══════════════════════════════════════════════ */
 
 :root {
@@ -43,23 +40,22 @@ body {
   overflow-x: hidden;
 }
 
-/* FUNDO — mesh gradient premium com spotlight laranja */
 body::before {
   content:'';
   position:fixed; inset:0;
   background:
-    radial-gradient(ellipse 70% 50% at 65% 15%, rgba(249,115,22,0.13) 0%, transparent 55%),
-    radial-gradient(ellipse 40% 35% at 10% 85%, rgba(250,204,21,0.07) 0%, transparent 50%),
-    radial-gradient(ellipse 50% 40% at 90% 75%, rgba(139,92,246,0.06) 0%, transparent 50%),
-    radial-gradient(ellipse 60% 30% at 30% 50%, rgba(249,115,22,0.04) 0%, transparent 60%);
+    radial-gradient(ellipse 70% 55% at 62% 18%, rgba(249,115,22,0.14) 0%, transparent 55%),
+    radial-gradient(ellipse 45% 35% at 10% 85%, rgba(250,204,21,0.07) 0%, transparent 50%),
+    radial-gradient(ellipse 50% 40% at 88% 78%, rgba(139,92,246,0.06) 0%, transparent 50%),
+    radial-gradient(ellipse 80% 20% at 50% 100%, rgba(249,115,22,0.05) 0%, transparent 60%);
   pointer-events:none; z-index:0;
 }
 
-/* Linha de brilho no topo — efeito premium */
+/* Linha brilho topo — efeito premium */
 body::after {
   content:'';
   position:fixed; top:0; left:var(--sidebar-w); right:0; height:1px;
-  background: linear-gradient(90deg, transparent 0%, rgba(249,115,22,0.4) 30%, rgba(250,204,21,0.3) 60%, transparent 100%);
+  background: linear-gradient(90deg, transparent, rgba(249,115,22,0.5) 30%, rgba(250,204,21,0.4) 60%, transparent);
   pointer-events:none; z-index:2;
 }
 
@@ -142,7 +138,7 @@ body::after {
 
 .splash-sub {
   font-size: 15px;
-  color: var(--text-primary);
+  color: var(--text-secondary);
   letter-spacing: 2px;
   text-transform: uppercase;
   opacity: 0;
@@ -177,17 +173,17 @@ body::after {
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* ─── SIDEBAR ✅ gradiente vertical ─── */
+/* ─── SIDEBAR ─── */
 .sidebar {
   width: var(--sidebar-w);
   min-height: 100vh;
   background: linear-gradient(180deg, #16161f 0%, #11111a 50%, #0e0e16 100%);
+  box-shadow: 4px 0 24px rgba(0,0,0,0.4);
   border-right: 1px solid var(--border);
   display: flex; flex-direction: column;
   position: fixed; left:0; top:0; bottom:0;
   z-index: 100;
   transition: transform var(--trans);
-  box-shadow: 4px 0 24px rgba(0,0,0,0.4);
 }
 
 .sidebar-logo {
@@ -221,19 +217,17 @@ body::after {
   border: 1px solid transparent;
   border-radius: 6px;
   background: none;
-  font-size: 13px; font-weight: 600;
-  color: var(--text-primary);
+  font-size: 16px;
   cursor: pointer;
   transition: all var(--trans);
   display: grid; place-items: center;
-
+  color: var(--text-primary);
   line-height: 1;
 }
 
-.lang-btn:hover { color: var(--text-primary); background: var(--bg-card); }
+.lang-btn:hover { background: var(--bg-card); opacity: 1; }
 
 .lang-btn.active {
-  color: var(--text-primary);
   opacity: 1;
   border-color: var(--accent);
   background: var(--accent-dim);
@@ -249,13 +243,13 @@ body::after {
 .nav-item {
   display: flex; align-items: center; gap: 12px;
   padding: 10px 14px; border-radius: var(--radius-sm);
-  color: var(--text-primary);
+  color: var(--text-secondary);
   text-decoration: none; font-size: 14px; font-weight: 500;
   transition: all var(--trans); position: relative;
 }
 
 .nav-item i { width:18px; height:18px; flex-shrink:0; }
-.nav-item:hover { color: var(--text-primary); background: rgba(255,255,255,0.05); }
+.nav-item:hover { color: var(--text-primary); background: var(--bg-card); }
 .nav-item.active { color: var(--accent); background: var(--accent-dim); }
 .nav-item.active::before {
   content:''; position:absolute; left:0; top:50%; transform:translateY(-50%);
@@ -312,7 +306,7 @@ body::after {
   cursor:pointer; transition:all var(--trans);
 }
 
-.btn-icon:hover { color:var(--text-primary); background:var(--bg-card-hover); box-shadow:0 4px 16px rgba(0,0,0,0.4); }
+.btn-icon:hover { color:var(--text-primary); background:var(--bg-card-hover); }
 .btn-icon i { width:18px; height:18px; }
 .master-toggle { color:var(--off); border-color:rgba(239,68,68,0.3); }
 .master-toggle.on { color:var(--on); border-color:rgba(34,197,94,0.3); background:rgba(34,197,94,0.08); }
@@ -338,21 +332,11 @@ body::after {
   gap:12px; margin-bottom:6px;
 }
 
-/* ✅ cards com mais profundidade */
 .stat-card {
-  background: linear-gradient(145deg, #1e1e2e, #16161f);
-  border:1px solid var(--border);
+  background:var(--bg-card); border:1px solid var(--border);
   border-radius:var(--radius); padding:16px;
   display:flex; align-items:center; gap:12px;
-  position:relative; overflow:hidden;
-  transition: all 0.25s ease;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.04);
-}
-
-.stat-card:hover {
-  border-color: rgba(249,115,22,0.25);
-  box-shadow: 0 4px 24px rgba(0,0,0,0.5), 0 0 0 1px rgba(249,115,22,0.1), inset 0 1px 0 rgba(255,255,255,0.06);
-  transform: translateY(-1px);
+  position:relative; overflow:hidden; transition:border-color var(--trans);
 }
 
 .stat-card::before {
@@ -385,18 +369,15 @@ body::after {
 }
 
 .quick-card {
-  background: linear-gradient(145deg, #1e1e2e, #16161f);
-  border:1px solid var(--border);
+  background:var(--bg-card); border:1px solid var(--border);
   border-radius:var(--radius); padding:18px 14px;
   display:flex; flex-direction:column; align-items:center; gap:7px;
-  cursor:pointer; transition:all 0.25s ease; text-align:center;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+  cursor:pointer; transition:all var(--trans); text-align:center;
 }
 
 .quick-card:hover {
-  border-color:rgba(249,115,22,0.3); background: linear-gradient(145deg, #222235, #1a1a28);
-  transform:translateY(-3px);
-  box-shadow: 0 8px 28px rgba(0,0,0,0.5), 0 0 16px rgba(249,115,22,0.12);
+  border-color:var(--border-strong); background:var(--bg-card-hover);
+  transform:translateY(-2px);
 }
 
 .quick-card span { font-weight:500; font-size:14px; }
@@ -430,38 +411,29 @@ body::after {
 }
 
 .scene-btn {
-  background: linear-gradient(145deg, #1e1e2e, #16161f);
-  border:1px solid var(--border);
+  background:var(--bg-card); border:1px solid var(--border);
   border-radius:var(--radius); padding:16px 10px;
   display:flex; flex-direction:column; align-items:center; gap:7px;
   cursor:pointer; color:var(--text-primary);
   font-family:'DM Sans',sans-serif; font-size:14px; font-weight:500;
-  transition:all 0.25s ease;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.25);
+  transition:all var(--trans);
 }
 
 .scene-btn:hover {
-  background: linear-gradient(145deg, #222235, #1a1a28);
-  border-color:var(--accent);
-  box-shadow: 0 6px 20px rgba(0,0,0,0.4), 0 0 16px rgba(249,115,22,0.2);
-  transform:translateY(-2px);
+  background:var(--bg-card-hover); border-color:var(--accent);
+  box-shadow:0 0 14px var(--accent-glow); transform:translateY(-2px);
 }
 
 .scene-emoji { font-size:26px; }
 
-/* ─── CONTROL CARDS ✅ sombra e glow no hover ─── */
+/* ─── CONTROL CARDS ─── */
 .control-card {
-  background: linear-gradient(145deg, #1e1e2e, #15151f);
-  border:1px solid var(--border);
+  background:var(--bg-card); border:1px solid var(--border);
   border-radius:var(--radius); padding:20px; margin-bottom:16px;
-  transition: all 0.25s ease;
-  box-shadow: 0 2px 16px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.04);
+  transition:border-color var(--trans);
 }
 
-.control-card:hover {
-  border-color: rgba(249,115,22,0.2);
-  box-shadow: 0 6px 32px rgba(0,0,0,0.5), 0 0 0 1px rgba(249,115,22,0.08), inset 0 1px 0 rgba(255,255,255,0.06);
-}
+.control-card:hover { border-color:var(--border-strong); }
 
 .control-card-header {
   display:flex; align-items:center; justify-content:space-between;
@@ -566,25 +538,22 @@ body::after {
 }
 
 .effect-card {
-  background: linear-gradient(145deg, #1e1e2e, #15151f);
-  border:1px solid var(--border);
+  background:var(--bg-card); border:1px solid var(--border);
   border-radius:var(--radius); padding:20px 14px;
   display:flex; flex-direction:column; align-items:center; gap:9px;
   cursor:pointer; color:var(--text-primary);
-  font-family:'DM Sans',sans-serif; transition:all 0.25s ease;
+  font-family:'DM Sans',sans-serif; transition:all var(--trans);
   position:relative; overflow:hidden; text-align:center;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.3);
 }
 
 .effect-card:hover {
-  border-color:var(--accent); background: linear-gradient(145deg, #222235, #1a1a28);
-  box-shadow: 0 8px 28px rgba(0,0,0,0.5), 0 0 20px rgba(249,115,22,0.2);
-  transform:translateY(-3px);
+  border-color:var(--accent); background:var(--bg-card-hover);
+  box-shadow:0 0 20px var(--accent-glow); transform:translateY(-3px);
 }
 
 .effect-card.active {
-  border-color:var(--accent); background: linear-gradient(145deg, #251e18, #1a1510);
-  box-shadow: 0 0 28px rgba(249,115,22,0.3), inset 0 0 20px rgba(249,115,22,0.05);
+  border-color:var(--accent); background:var(--accent-dim);
+  box-shadow:0 0 24px var(--accent-glow);
 }
 
 .effect-card i { width:26px; height:26px; color:var(--accent); }
@@ -619,93 +588,111 @@ body::after {
 
 /* ─── FLAGS GRID ─── */
 .flags-grid {
-  display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr));
+  display:grid; grid-template-columns:repeat(5,1fr);
   gap:12px; margin-bottom:22px;
 }
 
 .flag-card {
-  background: linear-gradient(145deg, #1e1e2e, #15151f);
-  border:1px solid var(--border);
-  border-radius:var(--radius); padding:0 0 16px;
-  display:flex; flex-direction:column; align-items:center; gap:8px;
+  background:var(--bg-card); border:1px solid var(--border);
+  border-radius:var(--radius); padding:0 0 12px;
+  display:flex; flex-direction:column; align-items:center; gap:6px;
   cursor:pointer; color:var(--text-primary);
-  font-family:'DM Sans',sans-serif; font-size:14px; font-weight:500;
-  transition:all 0.25s ease; overflow:hidden;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+  font-family:'DM Sans',sans-serif; font-size:13px; font-weight:600;
+  transition:all var(--trans); overflow:hidden;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.25);
 }
 
 .flag-card:hover {
-  border-color:rgba(249,115,22,0.3);
+  border-color:rgba(249,115,22,0.4);
   transform:translateY(-3px);
-  box-shadow: 0 8px 28px rgba(0,0,0,0.5), 0 0 16px rgba(249,115,22,0.15);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.5), 0 0 14px rgba(249,115,22,0.15);
 }
 
 .flag-card.active {
   border-color:var(--accent);
-  box-shadow: 0 0 24px rgba(249,115,22,0.3);
+  box-shadow:0 0 22px rgba(249,115,22,0.35);
 }
 
 .flag-preview {
-  width:100%; height:52px;
-  margin-bottom:4px;
+  width:100%; height:60px;
+  position:relative; overflow:hidden;
   flex-shrink:0;
 }
 
-.flag-emoji { font-size:22px; line-height:1; }
+.flag-name { font-size:12px; font-weight:600; color:var(--text-primary); }
 
-/* ✅ BANDEIRAS CORRIGIDAS */
-/* Portugal — verde | amarelo | vermelho (vertical) */
+/* ═══ BANDEIRAS — CSS preciso com cores corretas ═══ */
+
+/* Portugal: Verde | Amarelo | Vermelho (vertical 38/24/38) */
 .pt-flag { background:linear-gradient(90deg, #006600 38%, #ffcc00 38% 62%, #cc0000 62%); }
 
-/* Brasil — verde com faixa amarela diagonal central */
-.br-flag { background:#009c3b; position:relative; }
-.br-flag::after {
-  content:''; position:absolute; inset:0;
-  background: linear-gradient(90deg, transparent 15%, #ffdf00 15% 85%, transparent 85%);
-  clip-path: polygon(15% 0%, 85% 0%, 100% 50%, 85% 100%, 15% 100%, 0% 50%);
-}
-
-/* Espanha — rojo | amarillo | rojo (horizontal) */
-.es-flag { background:linear-gradient(180deg, #c60b1e 25%, #ffc400 25% 75%, #c60b1e 75%); }
-
-/* França — azul | branco | vermelho (vertical) */
-.fr-flag { background:linear-gradient(90deg, #002395 33%, #fff 33% 66%, #ed2939 66%); }
-
-/* Alemanha — preto | vermelho | amarelo (horizontal) */
-.de-flag { background:linear-gradient(180deg, #000 33%, #dd0000 33% 66%, #ffce00 66%); }
-
-/* Itália — verde | branco | vermelho (vertical) */
-.it-flag { background:linear-gradient(90deg, #009246 33%, #fff 33% 66%, #ce2b37 66%); }
-
-/* Reino Unido — aproximação ao Union Jack */
-.gb-flag {
-  background: #012169;
+/* Brasil: Verde fundo, losango amarelo, círculo azul+branco */
+.br-flag {
+  background: #009c3b;
   position: relative;
 }
+.br-flag::before {
+  content:''; position:absolute; inset:0;
+  background: linear-gradient(90deg, transparent 12%, #ffdf00 12% 88%, transparent 88%);
+  clip-path: polygon(12% 0%,88% 0%,100% 50%,88% 100%,12% 100%,0% 50%);
+}
+.br-flag::after {
+  content:''; position:absolute; top:50%; left:50%;
+  transform:translate(-50%,-50%);
+  width:18px; height:18px; border-radius:50%;
+  background:#002776;
+  box-shadow:0 0 0 3px #fff;
+}
+
+/* Espanha: Vermelho | Amarelo | Vermelho (horizontal 1/2/1) */
+.es-flag { background:linear-gradient(180deg, #c60b1e 25%, #ffc400 25% 75%, #c60b1e 75%); }
+
+/* França: Azul | Branco | Vermelho (vertical) */
+.fr-flag { background:linear-gradient(90deg, #002395 33%, #fff 33% 66%, #ed2939 66%); }
+
+/* Alemanha: Preto | Vermelho | Amarelo (horizontal) */
+.de-flag { background:linear-gradient(180deg, #000 33%, #dd0000 33% 66%, #ffce00 66%); }
+
+/* Itália: Verde | Branco | Vermelho (vertical) */
+.it-flag { background:linear-gradient(90deg, #009246 33%, #fff 33% 66%, #ce2b37 66%); }
+
+/* Reino Unido: Azul base com cruz branca e vermelha */
+.gb-flag { background:#012169; position:relative; }
 .gb-flag::before {
   content:''; position:absolute; inset:0;
   background:
-    linear-gradient(to bottom right, transparent calc(50% - 5px), #fff calc(50% - 5px) calc(50% + 5px), transparent calc(50% + 5px)),
-    linear-gradient(to bottom left,  transparent calc(50% - 5px), #fff calc(50% - 5px) calc(50% + 5px), transparent calc(50% + 5px));
+    linear-gradient(#fff 0 0) center/100% 30% no-repeat,
+    linear-gradient(#fff 0 0) center/20% 100% no-repeat,
+    linear-gradient(to bottom right, transparent calc(50% - 6px), #fff calc(50% - 6px) calc(50% + 6px), transparent calc(50% + 6px)),
+    linear-gradient(to bottom left,  transparent calc(50% - 6px), #fff calc(50% - 6px) calc(50% + 6px), transparent calc(50% + 6px));
 }
 .gb-flag::after {
   content:''; position:absolute; inset:0;
   background:
+    linear-gradient(#c8102e 0 0) center/100% 15% no-repeat,
+    linear-gradient(#c8102e 0 0) center/10% 100% no-repeat,
     linear-gradient(to bottom right, transparent calc(50% - 3px), #c8102e calc(50% - 3px) calc(50% + 3px), transparent calc(50% + 3px)),
-    linear-gradient(to bottom left,  transparent calc(50% - 3px), #c8102e calc(50% - 3px) calc(50% + 3px), transparent calc(50% + 3px)),
-    linear-gradient(#fff 0 0) center / 20% 100% no-repeat,
-    linear-gradient(#fff 0 0) center / 100% 30% no-repeat;
+    linear-gradient(to bottom left,  transparent calc(50% - 3px), #c8102e calc(50% - 3px) calc(50% + 3px), transparent calc(50% + 3px));
 }
 
-/* EUA — listras vermelhas e brancas */
-.us-flag { background:repeating-linear-gradient(180deg,#B22234 0%,#B22234 7.7%,#fff 7.7%,#fff 15.4%); }
+/* EUA: Vermelho | Branco | Azul — listras + cantão azul */
+.us-flag {
+  background:
+    repeating-linear-gradient(180deg, #b22234 0%, #b22234 7.69%, #fff 7.69%, #fff 15.38%);
+  position:relative;
+}
+.us-flag::after {
+  content:''; position:absolute; top:0; left:0;
+  width:40%; height:53.85%;
+  background:#3c3b6e;
+}
 
-/* Japão — branco com círculo vermelho */
+/* Japão: Branco com círculo vermelho central */
 .jp-flag { background:#fff; position:relative; }
 .jp-flag::after {
   content:''; position:absolute; top:50%; left:50%;
   transform:translate(-50%,-50%);
-  width:26px; height:26px; border-radius:50%;
+  width:28px; height:28px; border-radius:50%;
   background:#bc002d;
 }
 
@@ -713,52 +700,33 @@ body::after {
 .btn-stop-effect {
   display:inline-flex; align-items:center; gap:8px;
   padding:11px 20px;
-  background:rgba(239,68,68,0.08); border:1px solid rgba(239,68,68,0.25);
+  background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.3);
   border-radius:var(--radius-sm); color:var(--off);
   font-family:'DM Sans',sans-serif; font-size:14px; font-weight:500;
   cursor:pointer; transition:all var(--trans);
-  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
 }
 
-.btn-stop-effect:hover {
-  background:rgba(239,68,68,0.16); border-color:var(--off);
-  box-shadow: 0 4px 16px rgba(239,68,68,0.2);
-}
+.btn-stop-effect:hover { background:rgba(239,68,68,0.2); border-color:var(--off); }
 .btn-stop-effect i { width:15px; height:15px; }
 
-/* ─── BTN GROUP ✅ botões ON/OFF com ícones ─── */
+/* ─── BTN GROUP ─── */
 .btn-group { display:flex; gap:8px; }
 
 .btn-sm {
   padding:8px 14px; border-radius:var(--radius-sm);
   font-family:'DM Sans',sans-serif; font-size:13px; font-weight:600;
   cursor:pointer; border:1px solid; transition:all var(--trans);
-  display:inline-flex; align-items:center; gap:6px;
 }
-
-.btn-sm::before {
-  font-size:14px; line-height:1;
-}
-
-.btn-on::before  { content:'⚡'; }
-.btn-off::before { content:'○'; }
 
 .btn-on  { background:rgba(34,197,94,0.1); border-color:rgba(34,197,94,0.4); color:var(--on); }
 .btn-off { background:rgba(239,68,68,0.1); border-color:rgba(239,68,68,0.3); color:var(--off); }
-.btn-on:hover  { background:rgba(34,197,94,0.2); box-shadow:0 0 12px rgba(34,197,94,0.2); }
-.btn-off:hover { background:rgba(239,68,68,0.2); box-shadow:0 0 12px rgba(239,68,68,0.2); }
+.btn-on:hover  { background:rgba(34,197,94,0.2); }
+.btn-off:hover { background:rgba(239,68,68,0.2); }
 
 /* ─── SETTINGS ─── */
 .settings-card {
-  background: linear-gradient(145deg, #1e1e2e, #15151f);
-  border:1px solid var(--border);
+  background:var(--bg-card); border:1px solid var(--border);
   border-radius:var(--radius); padding:20px; margin-bottom:16px;
-  box-shadow: 0 2px 14px rgba(0,0,0,0.3);
-}
-
-.settings-card:hover {
-  border-color: rgba(249,115,22,0.15);
-  box-shadow: 0 4px 24px rgba(0,0,0,0.4), 0 0 0 1px rgba(249,115,22,0.06);
 }
 
 .settings-card h3 {
@@ -841,30 +809,13 @@ body::after {
 .about-tagline { color:var(--text-secondary); font-size:15px; }
 
 .about-grid {
-  display:grid; grid-template-columns:repeat(2,1fr);
+  display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
   gap:14px; margin-bottom:14px;
 }
 
-/* Centrar cards PAP + Equipa dentro do about-grid */
-.about-grid .about-card {
-  display:flex; flex-direction:column; align-items:center; text-align:center;
-}
-.about-grid .about-card h3 { width:100%; text-align:center; }
-.about-grid .about-card .about-info-list { width:100%; text-align:left; }
-.about-grid .about-card .team-member { justify-content:center; }
-.about-grid .about-card .team-divider { width:100%; }
-
 .about-card {
-  background: linear-gradient(145deg, #1e1e2e, #15151f);
-  border:1px solid var(--border);
+  background:var(--bg-card); border:1px solid var(--border);
   border-radius:var(--radius); padding:22px; margin-bottom:14px;
-  box-shadow: 0 2px 14px rgba(0,0,0,0.3);
-  transition: all 0.25s ease;
-}
-
-.about-card:hover {
-  border-color: rgba(249,115,22,0.15);
-  box-shadow: 0 6px 28px rgba(0,0,0,0.45), 0 0 0 1px rgba(249,115,22,0.07);
 }
 
 .about-card:last-child { margin-bottom:0; }
@@ -929,30 +880,12 @@ body::after {
   font-size:13px; color:var(--text-secondary); font-weight:500;
 }
 
-/* ✅ School card — centrado */
+/* School card */
 .school-card {
   display:flex; flex-direction:column;
-  align-items:center; gap:14px;
+  align-items:center; gap:10px;
   text-align:center;
 }
-
-.school-logo-row {
-  display:flex; flex-direction:column;
-  align-items:center; gap:12px;
-}
-
-.school-logo-placeholder {
-  width:64px; height:64px; border-radius:12px;
-  background:linear-gradient(135deg,#006600,#003300);
-  display:flex; flex-direction:column; align-items:center; justify-content:center;
-  gap:2px;
-}
-
-.school-logo-placeholder span:first-child {
-  font-family:'Syne',sans-serif; font-size:18px; font-weight:800; color:#fff;
-}
-
-.school-logo-text { font-size:7px; color:rgba(255,255,255,0.7); text-align:center; line-height:1.2; }
 
 .school-info { display:flex; flex-direction:column; gap:4px; align-items:center; }
 .school-info strong { font-size:14px; font-weight:600; }
@@ -967,8 +900,7 @@ body::after {
 /* ─── TOAST ─── */
 .toast {
   position:fixed; bottom:24px; right:24px;
-  background: linear-gradient(145deg, #1e1e2e, #15151f);
-  border:1px solid var(--border-strong);
+  background:var(--bg-card); border:1px solid var(--border-strong);
   border-radius:var(--radius-sm); padding:11px 18px;
   font-size:14px; font-weight:500; color:var(--text-primary);
   box-shadow:0 8px 32px rgba(0,0,0,0.6);
@@ -978,9 +910,9 @@ body::after {
 }
 
 .toast.show { opacity:1; transform:translateY(0); }
-.toast.success { border-color:rgba(34,197,94,0.5); box-shadow:0 8px 32px rgba(0,0,0,0.6), 0 0 12px rgba(34,197,94,0.15); }
-.toast.error   { border-color:rgba(239,68,68,0.4);  box-shadow:0 8px 32px rgba(0,0,0,0.6), 0 0 12px rgba(239,68,68,0.12); }
-.toast.info    { border-color:rgba(249,115,22,0.4);  box-shadow:0 8px 32px rgba(0,0,0,0.6), 0 0 12px rgba(249,115,22,0.15); }
+.toast.success { border-color:rgba(34,197,94,0.5); }
+.toast.error   { border-color:rgba(239,68,68,0.4); }
+.toast.info    { border-color:rgba(249,115,22,0.4); }
 
 /* ─── HAMBURGER ─── */
 .hamburger {
@@ -1027,45 +959,4 @@ body::after {
   .quick-grid  { grid-template-columns:1fr 1fr; }
   .flags-grid  { grid-template-columns:repeat(2,1fr); }
   .color-row   { flex-direction:column; align-items:flex-start; }
-}
-
-/* ═══ BANDEIRAS — emoji grande como imagem real ═══ */
-.flag-card {
-  padding: 12px 10px 14px;
-  gap: 6px;
-}
-
-.flag-preview {
-  width: 100%; height: 64px;
-  border-radius: 8px;
-  overflow: hidden;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 52px;
-  line-height: 1;
-  margin-bottom: 0;
-  background: none;
-}
-
-.flag-code {
-  font-family: 'Syne', sans-serif;
-  font-size: 11px; font-weight: 700;
-  letter-spacing: 1px;
-  color: var(--text-muted);
-  text-transform: uppercase;
-}
-
-.flag-name {
-  font-size: 13px; font-weight: 600;
-  color: var(--text-primary);
-}
-
-/* Grid 5 colunas fixas */
-.flags-grid {
-  grid-template-columns: repeat(5, 1fr) !important;
-}
-
-/* About grid — centrado sem espaço vazio */
-.about-grid {
-  grid-template-columns: repeat(2, minmax(0, 420px)) !important;
-  justify-content: center;
 }
